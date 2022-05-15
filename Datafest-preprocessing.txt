@@ -1,0 +1,11 @@
+import pandas as pd
+import numpy as np
+df=pd.read_csv("/Users/kaushikthakkar/Downloads/logs.csv")
+df_new = df[['player_id','session','event_id','event_category','event_time_dbl','avatar_id']]
+
+df_new['dummy']=(df_new['event_time_dbl'].shift())
+df_new=(df_new.groupby('player_id').apply(lambda x:x.assign(delta_sec=df_new['event_time_dbl']-df_new['dummy'])))
+
+df_new['delta_sec']=np.where(df_new.delta_sec<(0),0,df_new.delta_sec)
+df_new['delta_sec']=np.where(df_new.delta_sec==(None),0,df_new.delta_sec)
+df_new.to_csv(r'/Users/kaushikthakkar/Downloads/logs_delta_sec.csv', index = False, header=True)
